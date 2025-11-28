@@ -53,7 +53,21 @@ app.post("/signin", (req,res) => {
     }
 });
 
-app.get("/me", (req,res) => {
+function auth(req,res,next) {
+    const token = req.headers.authorization
+    const decodeData = jwt.verify(token, JWT_SECRET)
+
+    if(decodeData.username) {
+        req.username = decodeData.username
+        next()
+    } else {
+        res.json({
+            message: "You are not logged in"
+        })
+    }
+}
+
+app.get("/me",auth, (req,res) => {
     const token = req.headers.authorization;
     const userDetails = jwt.verify(token, JWT_SECRET)
 
@@ -63,7 +77,8 @@ app.get("/me", (req,res) => {
 
     if(user) {
         res.send({
-            username: user.username
+            username: user.username,
+            password: user.password
         })
     } else {
         res.status(401).send({
