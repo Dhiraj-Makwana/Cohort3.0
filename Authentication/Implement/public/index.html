@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auth-Web</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -17,24 +18,28 @@
 
             if(token) {
                 //user is logged in
-                app.innerHTML = `<div id="information">User Information: </div>
-                                <button type="button" onclick="logout()">Logout</button>`
+                app.innerHTML = `<div class="card">
+                                <div id="information">User Information: </div>
+                                <button class="btn" type="button" onclick="logout()">Logout</button>
+                                </div>`
                 getUserInformation()
             } 
             else {
                 //user not logged in
-                app.innerHTML = `<div id="signup">
-                                    Signup
-                                    <input id="signup-username" type="text" placeholder="Username...">
-                                    <input id="signup-password" type="password" placeholder="Password...">
-                                    <button id="signup-submit" type="button" onclick="signup()">Submit</button>
+                app.innerHTML = `<div class="card">
+                                <div class="signup">
+                                    Sign-up:
+                                    <input class="signup-username" id="signup-username" type="text" placeholder="Username...">
+                                    <input class="signup-username" id="signup-password" type="password" placeholder="Password...">
+                                    <button class="btn" id="signup-submit" type="button" onclick="signup()">Submit</button>
                                 </div>
 
-                                <div id="signin">
-                                    Signin
-                                    <input id="signin-username" type="text" placeholder="Username...">
-                                    <input id="signin-password" type="password" placeholder="Password...">
-                                    <button id="signin-submit" type="button" onclick="signin()">Submit</button>
+                                <div class="signup">
+                                    Sign-in:
+                                    <input class="signup-username" id="signin-username" type="text" placeholder="Username...">
+                                    <input class="signup-username" id="signin-password" type="password" placeholder="Password...">
+                                    <button class="btn" id="signin-submit" type="button" onclick="signin()">Submit</button>
+                                </div>
                                 </div>`
             }
         }
@@ -75,7 +80,7 @@
                     token: localStorage.getItem("token")
                 }
             })
-            document.getElementById("information").innerHTML = "Username: "+ response.data.username + " Password: " + response.data.password
+            document.getElementById("information").innerHTML = "Username: "+ response.data.username + " || Password: " + response.data.password
             } catch(err) {
                 console.log("User not logged in")
             }
