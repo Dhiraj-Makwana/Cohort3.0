@@ -5,7 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auth-Web</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
-    <script>
+</head>
+<body>
+
+    <div id="appUI"></div>
+
+    <script defer>
+        function renderUI() {
+            const token = localStorage.getItem("token")
+            const app = document.getElementById("appUI")
+
+            if(token) {
+                //user is logged in
+                app.innerHTML = `<div id="information">User Information: </div>
+                                <button type="button" onclick="logout()">Logout</button>`
+                getUserInformation()
+            } 
+            else {
+                //user not logged in
+                app.innerHTML = `<div id="signup">
+                                    Signup
+                                    <input id="signup-username" type="text" placeholder="Username...">
+                                    <input id="signup-password" type="password" placeholder="Password...">
+                                    <button id="signup-submit" type="button" onclick="signup()">Submit</button>
+                                </div>
+
+                                <div id="signin">
+                                    Signin
+                                    <input id="signin-username" type="text" placeholder="Username...">
+                                    <input id="signin-password" type="password" placeholder="Password...">
+                                    <button id="signin-submit" type="button" onclick="signin()">Submit</button>
+                                </div>`
+            }
+        }
+
         async function signup() {
             const username = document.getElementById("signup-username").value
             const password = document.getElementById("signup-password").value
@@ -27,40 +60,28 @@
             })
             localStorage.setItem("token", response.data.token)
             alert("You are signed in")
+            renderUI()
+        }
+
+        function logout() {
+            localStorage.removeItem("token")
+            renderUI()
         }
 
         async function getUserInformation() {
-            const response = await axios.get("http://localhost:3000/me", {
+            try {
+                const response = await axios.get("http://localhost:3000/me", {
                 headers: {
                     token: localStorage.getItem("token")
                 }
             })
             document.getElementById("information").innerHTML = "Username: "+ response.data.username + " Password: " + response.data.password
+            } catch(err) {
+                console.log("User not logged in")
+            }
         }
-        getUserInformation()
+        document.addEventListener("DOMContentLoaded", renderUI);
     </script>
-</head>
-<body>
-
-    <div id="signup">
-        Signup
-        <input id="signup-username" type="text" placeholder="Username...">
-        <input id="signup-password" type="password" placeholder="Password...">
-        <button id="signup-submit" type="button" onclick="signup()">Submit</button>
-    </div>
-
-    <div id="signin">
-        Signin
-        <input id="signin-username" type="text" placeholder="Username...">
-        <input id="signin-password" type="password" placeholder="Password...">
-        <button id="signin-submit" type="button" onclick="signin()">Submit</button>
-    </div>
-
-    <div id="information">User Information: </div>
-
-    <div>
-        <button type="button" onclick="logout()">Logout</button>
-    </div>
     
 </body>
 </html>

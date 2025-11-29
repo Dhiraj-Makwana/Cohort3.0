@@ -1,10 +1,12 @@
 const express = require("express")
+const cors = require("cors");
 const jwt = require("jsonwebtoken")
 const JWT_SECRET = "World$Be$tProgrammer"
 
 const app = express()
 const users = []
 app.use(express.json())
+app.use(cors())
 
 app.get("/", function(req, res) {
     res.sendFile(__dirname + "/public/index.html")
@@ -52,15 +54,13 @@ app.post("/signin", function(req, res) {
 
 function auth(req, res, next) {
     const token = req.headers.token
-    const decodeToken = jwt.verify(token, JWT_SECRET)
 
-    if(decodeToken.username) {
+    try {
+        const decodeToken = jwt.verify(token, JWT_SECRET)
         req.user = decodeToken.username
         next()
-    } else {
-        res.json({
-            message: "Authentication failed"
-        })
+    } catch(err) {
+        res.status(401).json({message: "Authentication failed"})
     }
 }
 
