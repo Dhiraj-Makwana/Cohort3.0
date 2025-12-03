@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const { UserModel, TodoModel } = require("./db");
 const objectId = mongoose.Types.objectId;
 
-mongoose.connect("mongodb+srv://mrincident265_db_user:poAdMa4BPIiRgJfN@cluster0.jl6xp7n.mongodb.net/todo-test")
+mongoose.connect("")
 const app = express();
 app.use(express.json());
 
