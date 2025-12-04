@@ -3,17 +3,17 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "World$Be$tProgrammer";
 const mongoose = require("mongoose");
 const { UserModel, TodoModel } = require("./db");
-const objectId = mongoose.Types.objectId;
+const objectId = mongoose.Types.ObjectId;
 const bcrypt = require("bcrypt");
 const zod = require("zod");
 
-mongoose.connect("")
+mongoose.connect("mongodb+srv://mrincident265_db_user:poAdMa4BPIiRgJfN@cluster0.jl6xp7n.mongodb.net/todo-test")
 const app = express();
 app.use(express.json());
 
 app.post("/signup", async function(req, res) {
     const requireBody = zod.object({
-        email: zod.string().min(3).max(100).z.email(),
+        email: zod.email().min(3).max(100),
         password: zod.string().min(5).max(100).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/),
         name: zod.string().min(3).max(100),
     });
@@ -51,7 +51,7 @@ app.post("/signin", async function(req, res) {
         return res.status(403).json({ message: "Invalid Credentials!" });
     }
     
-    const passwordMatch = bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if(passwordMatch) {
         const token = jwt.sign({ id: user._id.toString() }, JWT_SECRET);
@@ -73,7 +73,7 @@ app.post("/todo", auth, async function(req, res) {
     await TodoModel.create({
         userId,
         title,
-        done: done || flase,
+        done: done || false,
         deadline
     });
 
@@ -139,16 +139,12 @@ app.delete("/todo/:id", auth, async function(req, res) {
 function auth(req, res, next) {
     const token = req.headers.token;
 
-    const decodeToken = jwt.verify(token, JWT_SECRET);
-
-    if(decodeToken) {
+    try {
+        const decodeToken = jwt.verify(token, JWT_SECRET);
         req.userId = decodeToken.id;
         next();
-    }
-    else {
-        res.json({
-            message: "Incorrect credentials"
-        });
+    } catch(error) {
+        return res.status(403).json({ message: "Invalid token" });
     }
 }
 
