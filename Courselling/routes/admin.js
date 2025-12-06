@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "world$be$tprogrammer";
 const zod = require("zod");
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { Router } = require("express");
 const adminRouter = Router();
@@ -14,7 +14,8 @@ adminRouter.post("/signup", async function(req, res) {
     const requireBody = zod.object({
         email: zod.email().min(5).max(100),
         password: zod.string().min(4).max(100),
-        firstName: zod.string().min(3).max(100)
+        firstName: zod.string().min(3).max(100),
+        lastName: zod.string().min(3).max(100)
     })
 
     const parseData = requireBody.safeParse(req.body);
@@ -26,11 +27,11 @@ adminRouter.post("/signup", async function(req, res) {
         });
     }
 
-    const { email, password, firstName } = req.body;
+    const { email, password, firstName, lastName } = req.body;
     const hashedPassword = await bcrypt.hash(password, 5);
 
     try{
-        await AdminModel.create({ email, password: hashedPassword, firstName})
+        await AdminModel.create({ email, password: hashedPassword, firstName, lastName })
     }
     catch(error) {
         res.json({
@@ -55,7 +56,7 @@ adminRouter.post("/signin", async function(req, res) {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if(passwordMatch) {
-        const token = jwt.sign({ id: user._id.toString() }, JWT_SECRET)
+        const token = jwt.sign({ id: user._id.toString() }, process.env.JWT_SECRET_Admin)
         
         res.json({
             token,
